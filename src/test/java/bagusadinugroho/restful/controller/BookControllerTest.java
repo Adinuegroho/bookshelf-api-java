@@ -124,4 +124,30 @@ class BookControllerTest {
 //            assertNotNull(response.getErrors());
 //        });
 //    }
+
+    @Test
+    void getBooksSuccess() throws Exception {
+        Books books = new Books();
+        books.setId("test");
+        books.setPrice("limapoloh");
+        books.setTitle("iniTitle");
+        books.setWritter("bukansembarangpenulis");
+        bookRepository.save(books);
+
+        mockMvc.perform(
+                get("/books/test")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<BookResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getErrors());
+            assertEquals(books.getId(), response.getData().getId());
+            assertEquals(books.getPrice(), response.getData().getPrice());
+            assertEquals(books.getTitle(), response.getData().getTitle());
+            assertEquals(books.getWritter(), response.getData().getWritter());
+        });
+    }
 }

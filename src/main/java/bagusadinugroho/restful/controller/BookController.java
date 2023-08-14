@@ -7,10 +7,7 @@ import bagusadinugroho.restful.model.WebResponse;
 import bagusadinugroho.restful.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +34,14 @@ public class BookController {
     public WebResponse<List<BookResponse>> list(Books books) {
         List<BookResponse> bookResponses = bookService.list();
         return WebResponse.<List<BookResponse>>builder().data(bookResponses).build();
+    }
+
+    @GetMapping(
+            path = "/books/{bookId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<BookResponse> get(@PathVariable("bookId") String bookId) {
+        BookResponse bookResponse = bookService.get(bookId);
+        return WebResponse.<BookResponse>builder().data(bookResponse).build();
     }
 }

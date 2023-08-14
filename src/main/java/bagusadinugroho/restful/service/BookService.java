@@ -6,8 +6,10 @@ import bagusadinugroho.restful.model.CreateBookRequest;
 import bagusadinugroho.restful.repository.BookRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,4 +49,10 @@ public class BookService {
         return bookss.stream().map(this::toBooksResponse).toList();
     }
 
+    public BookResponse get(String booksId) {
+        Books books = bookRepository.findBooksById(booksId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Books is not found"));
+
+        return toBooksResponse(books);
+    }
 }
