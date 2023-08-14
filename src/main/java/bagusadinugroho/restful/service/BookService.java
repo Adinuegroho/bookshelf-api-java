@@ -4,10 +4,12 @@ import bagusadinugroho.restful.entity.Books;
 import bagusadinugroho.restful.model.BookResponse;
 import bagusadinugroho.restful.model.CreateBookRequest;
 import bagusadinugroho.restful.repository.BookRepository;
-import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -15,6 +17,15 @@ public class BookService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    private BookResponse toBooksResponse(Books books) {
+        return BookResponse.builder()
+                .id(books.getId())
+                .price(books.getPrice())
+                .title(books.getTitle())
+                .writter(books.getWritter())
+                .build();
+    }
 
     @Transactional
     public BookResponse create(CreateBookRequest request) {
@@ -27,12 +38,13 @@ public class BookService {
 
         bookRepository.save(books);
 
-        return BookResponse.builder()
-                .id(books.getId())
-                .price(books.getPrice())
-                .title(books.getTitle())
-                .writter(books.getWritter())
-                .build();
+        return toBooksResponse(books);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookResponse> list(){
+        List<Books> bookss = bookRepository.findAll();
+        return bookss.stream().map(this::toBooksResponse).toList();
     }
 
 }

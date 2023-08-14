@@ -1,5 +1,6 @@
 package bagusadinugroho.restful.controller;
 
+import bagusadinugroho.restful.entity.Books;
 import bagusadinugroho.restful.model.BookResponse;
 import bagusadinugroho.restful.model.CreateBookRequest;
 import bagusadinugroho.restful.model.WebResponse;
@@ -13,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -60,4 +63,65 @@ class BookControllerTest {
                 assertTrue(bookRepository.existsById(response.getData().getId()));
         });
     }
+
+//    @Test
+//    void testCreateBadRequest() throws Exception {
+//        CreateBookRequest request = new CreateBookRequest();
+//        request.setPrice("");
+//        request.setTitle("");
+//        request.setWritter("");
+//
+//        mockMvc.perform(
+//                post("/books")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(request))
+//        ).andExpectAll(
+//                status().isBadRequest()
+//        ).andDo(result -> {
+//            WebResponse<BookResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+//            });
+//                assertNotNull(response.getErrors());
+//        });
+//    }
+
+    @Test
+    void listBooksSuccess() throws Exception {
+        for (int i = 0; i < 5; i++) {
+            Books books = new Books();
+            books.setId("test" + i);
+            books.setPrice("limapoloh");
+            books.setTitle("iniTitle");
+            books.setWritter("bukansembarangpenulis");
+            bookRepository.save(books);
+        }
+
+        mockMvc.perform(
+                get("/books")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+            status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<BookResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+                assertNull(response.getErrors());
+                assertEquals(5, response.getData().size());
+        });
+    }
+
+//    @Test
+//    void listBoooksNotFound() throws Exception {
+//        mockMvc.perform(
+//                get("/books")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//        ).andExpectAll(
+//                status().isNotFound()
+//        ).andDo(result -> {
+//            WebResponse<List<BookResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+//            });
+//            assertNotNull(response.getErrors());
+//        });
+//    }
 }
