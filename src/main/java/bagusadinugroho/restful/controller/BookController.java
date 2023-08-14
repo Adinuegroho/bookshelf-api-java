@@ -3,6 +3,7 @@ package bagusadinugroho.restful.controller;
 import bagusadinugroho.restful.entity.Books;
 import bagusadinugroho.restful.model.BookResponse;
 import bagusadinugroho.restful.model.CreateBookRequest;
+import bagusadinugroho.restful.model.UpdateBookRequest;
 import bagusadinugroho.restful.model.WebResponse;
 import bagusadinugroho.restful.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,29 @@ public class BookController {
     public WebResponse<BookResponse> get(@PathVariable("bookId") String bookId) {
         BookResponse bookResponse = bookService.get(bookId);
         return WebResponse.<BookResponse>builder().data(bookResponse).build();
+    }
+
+    @PutMapping(
+            path = "/books/{bookId}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<BookResponse> update(
+            @RequestBody UpdateBookRequest request,
+            @PathVariable("bookId") String bookId
+    ) {
+        request.setId(bookId);
+
+        BookResponse bookResponse = bookService.update(request);
+        return WebResponse.<BookResponse>builder().data(bookResponse).build();
+    }
+
+    @DeleteMapping(
+            path = "/books/{bookId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String> delete(@PathVariable("bookId") String bookId) {
+        bookService.delete(bookId);
+        return WebResponse.<String>builder().data("OK").build();
     }
 }

@@ -3,6 +3,7 @@ package bagusadinugroho.restful.controller;
 import bagusadinugroho.restful.entity.Books;
 import bagusadinugroho.restful.model.BookResponse;
 import bagusadinugroho.restful.model.CreateBookRequest;
+import bagusadinugroho.restful.model.UpdateBookRequest;
 import bagusadinugroho.restful.model.WebResponse;
 import bagusadinugroho.restful.repository.BookRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -148,6 +149,115 @@ class BookControllerTest {
             assertEquals(books.getPrice(), response.getData().getPrice());
             assertEquals(books.getTitle(), response.getData().getTitle());
             assertEquals(books.getWritter(), response.getData().getWritter());
+        });
+    }
+
+    @Test
+    void testUpdateSuccess() throws Exception {
+
+        Books books = new Books();
+        books.setId("test");
+        books.setPrice("limapoloh");
+        books.setTitle("iniTitle");
+        books.setWritter("bukansembarangpenulis");
+        bookRepository.save(books);
+
+        UpdateBookRequest request = new UpdateBookRequest();
+        request.setPrice("20000");
+        request.setTitle("judultest");
+        request.setWritter("penulistest");
+
+        mockMvc.perform(
+                put("/books/test")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<BookResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertEquals(request.getPrice(), response.getData().getPrice());
+            assertEquals(request.getTitle(), response.getData().getTitle());
+            assertEquals(request.getWritter(), response.getData().getWritter());
+
+            assertTrue(bookRepository.existsById(response.getData().getId()));
+        });
+    }
+
+//    @Test
+//    void testUpdateBadRequest() throws Exception {
+//
+//        Books books = new Books();
+//        books.setId("123");
+//        books.setPrice("limapoloh");
+//        books.setTitle("iniTitle");
+//        books.setWritter("bukansembarangpenulis");
+//        bookRepository.save(books);
+//
+//        UpdateBookRequest request = new UpdateBookRequest();
+//        request.setPrice("ue");
+//        request.setTitle("ui");
+//        request.setWritter("");
+//
+//        mockMvc.perform(
+//                put("/books/123")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(request))
+//        ).andExpectAll(
+//                status().isBadRequest()
+//        ).andDo(result -> {
+//            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+//            });
+//                assertNotNull(response.getErrors());
+//        });
+//    }
+
+//    @Test
+//    void deleteBookNotFound() throws Exception {
+//        Books books = new Books();
+//        books.setId("test");
+//        books.setPrice("limapoloh");
+//        books.setTitle("iniTitle");
+//        books.setWritter("bukansembarangpenulis");
+//        bookRepository.save(books);
+//
+//        mockMvc.perform(
+//                delete("/books/1233")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .header("test")
+//        ).andExpectAll(
+//                status().isNotFound()
+//        ).andDo(result -> {
+//            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+//            });
+//            assertNotNull(response.getErrors());
+//        });
+//    }
+
+    @Test
+    void testDeleteSuccess() throws Exception {
+
+        Books books = new Books();
+        books.setId("test");
+        books.setPrice("limapoloh");
+        books.setTitle("iniTitle");
+        books.setWritter("bukansembarangpenulis");
+        bookRepository.save(books);
+
+        mockMvc.perform(
+                delete("/books/test")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            });
+            assertNull(response.getErrors());
+            assertEquals("OK", response.getData());
         });
     }
 }
